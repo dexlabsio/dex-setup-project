@@ -30,6 +30,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_STAG }}
           aws-region:            ${{ env.AWS_REGION }}
 
+      
+      - name: Install zip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip
+
       - name: Zip repository
         run: |
           echo "Creating $ZIP_NAME…"
