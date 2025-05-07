@@ -1,0 +1,47 @@
+name: dex_actions_pipeline
+
+on:
+  push
+
+jobs:
+  publish-zip-to-public-assets-bucket-STAG-AWS:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    env:
+      AWS_REGION:     ${{ secrets.AWS_S3_REGION }}
+      S3_BUCKET:      ${{ secrets.AWS_S3_BUCKET }}
+      ZIP_NAME:       dex-setup-project-0.1.0.zip
+
+    container:
+      image: us-east1-docker.pkg.dev/dex-apps-prod/xci/xci:v0.9.6
+      credentials:
+        username: _json_key
+        password: ${{ secrets.GCLOUD_ARTIFACT_REGISTRY_PUBLISHER_SERVICE_ACCOUNT_JSON }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID_STAG }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_STAG }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Publish to Stag
+        run: xci publish --config xci-stag-aws.yaml
+
+      - name: Zip repository
+        run: |
+          echo "Creating $ZIP_NAME…"
+          zip -r "$ZIP_NAME" .
+
+      - name: Upload zip to S3
+        run: |
+          echo "Uploading $ZIP_NAME to s3://$S3_BUCKET/"
+          aws s3 cp "$ZIP_NAME" "s3://$S3_BUCKET/$ZIP_NAME" --region "$AWS_REGION"
