@@ -13,12 +13,6 @@ jobs:
       S3_BUCKET:      ${{ secrets.AWS_S3_BUCKET }}
       ZIP_NAME:       dex-setup-project-0.1.0.zip
 
-    container:
-      image: us-east1-docker.pkg.dev/dex-apps-prod/xci/xci:v0.9.6
-      credentials:
-        username: _json_key
-        password: ${{ secrets.GCLOUD_ARTIFACT_REGISTRY_PUBLISHER_SERVICE_ACCOUNT_JSON }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
