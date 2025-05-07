@@ -33,7 +33,11 @@ jobs:
       - name: Zip repository
         run: |
           echo "Creating $ZIP_NAME…"
-          zip -r "$ZIP_NAME" .
+          # -x ".*"     excludes any top‐level hidden file/dir (.git, .gitignore, etc)
+          # -x "*/.*"   excludes any hidden file/dir in subdirectories
+          # -x "$ZIP_NAME" prevents including the zip we’re creating if it already exists
+          zip -r "$ZIP_NAME" . \
+            -x ".*" "*/.*" "$ZIP_NAME"
 
       - name: Upload zip to S3
         run: |
