@@ -30,12 +30,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_STAG }}
           aws-region:            ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Publish to Stag
-        run: xci publish --config xci-stag-aws.yaml
-
       - name: Zip repository
         run: |
           echo "Creating $ZIP_NAME…"
